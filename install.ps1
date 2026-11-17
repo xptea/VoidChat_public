@@ -18,6 +18,7 @@ function Get-PairingReady([string]$Executable) {
 }
 # END pairing-readiness
 if ($taskVersion.Contains('@')) { throw 'Use the generated installer from the public distribution repository.' }
+Write-Host 'Installing VoidChat helper...'
 $taskIdentity=[Security.Principal.WindowsIdentity]::GetCurrent()
 if ((New-Object Security.Principal.WindowsPrincipal($taskIdentity)).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) { throw 'Run without elevation as the ordinary helper account.' }
 $taskCPU=$env:PROCESSOR_ARCHITEW6432
@@ -59,7 +60,7 @@ try {
     if ($LASTEXITCODE -ne 0 -or $taskSelected.Count -ne 4) {throw 'Signed catalog verification failed.'}
     $taskCandidate=Join-Path $taskWork 'voidchat-helper.exe'
     Get-VerifiedTransportFile $taskSelected[0] $taskCandidate ([long]$taskSelected[2])
-    & $taskVerifier verify-asset --catalog $taskCatalog --component helper --os windows --arch $taskArch --file $taskCandidate
+    & $taskVerifier verify-asset --catalog $taskCatalog --component helper --os windows --arch $taskArch --file $taskCandidate | Out-Null
     if ($LASTEXITCODE -ne 0) {throw 'Helper signature/hash verification failed.'}
     $taskBin=Join-Path $env:LOCALAPPDATA 'Programs/VoidChat/bin'
     $taskTarget=Join-Path $taskBin 'voidchat-helper.exe'
@@ -80,12 +81,12 @@ try {
         $taskPrincipal=New-ScheduledTaskPrincipal -UserId $taskIdentity.Name -LogonType Interactive -RunLevel Limited
         Register-ScheduledTask -TaskName 'VoidChatHelper' -Action $taskAction -Trigger $taskTrigger -Principal $taskPrincipal -Force | Out-Null
         Start-ScheduledTask -TaskName 'VoidChatHelper'
-    } else {& $taskTarget start;if($LASTEXITCODE -ne 0){throw 'Helper startup failed.'}}
-    Write-Host "Installed helper $($taskSelected[3]) (catalog key primary: $taskPublicKey)."
+    } else {& $taskTarget start | Out-Null;if($LASTEXITCODE -ne 0){throw 'Helper startup failed.'}}
+    Write-Host "`nVoidChat helper $($taskSelected[3]) installed."
     if ($EnableRemote) {
         & $taskTarget enable;if($LASTEXITCODE -ne 0){throw 'Could not enable remote access; check Tailscale.'}
         Get-PairingReady $taskTarget
-    } else {Write-Host 'Remote access was not changed (off on a first install). To pair this host, rerun with -EnableRemote after signing in to Tailscale.'}
+    } else {Write-Host 'To pair this computer, run: voidchat-helper enable; voidchat-helper invite'}
 } finally {
     $taskResolved=[IO.Path]::GetFullPath($taskWork)
     $taskTempRoot=[IO.Path]::GetFullPath([IO.Path]::GetTempPath()).TrimEnd([IO.Path]::DirectorySeparatorChar)+[IO.Path]::DirectorySeparatorChar

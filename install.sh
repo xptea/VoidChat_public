@@ -21,10 +21,7 @@ if [ "$os" = linux ] && [ "$(getconf LONG_BIT 2>/dev/null || echo 64)" = 32 ]; t
   case "$arch" in amd64) arch=386;; arm64) arch=arm;; esac
 fi
 # Both glibc and musl use the same CGO_ENABLED=0, libc-independent executables.
-if [ "$os" = linux ]; then
-  if command -v ldd >/dev/null 2>&1 && ldd --version 2>&1 | grep -qi musl; then libc=musl; else libc=glibc-or-static; fi
-  printf 'Detected Linux %s (%s; pure-Go helper)\n' "$arch" "$libc"
-fi
+printf 'Installing VoidChat helper...\n'
 verifier_sha=''
 case "$os-$arch" in
     darwin-arm64) verifier_sha='f7bc579160718101bcb6889eb442a99a0f3d315a358a8c6260e607095ce8f0cc' ;;
@@ -53,7 +50,7 @@ asset_url=$(sed -n '1p' "$work/selected")
 asset_size=$(sed -n '3p' "$work/selected")
 selected_version=$(sed -n '4p' "$work/selected")
 download "$asset_url" "$work/helper" "$asset_size"
-"$work/verifier" verify-asset --catalog "$work/versions.json" --component helper --os "$os" --arch "$arch" --file "$work/helper"
+"$work/verifier" verify-asset --catalog "$work/versions.json" --component helper --os "$os" --arch "$arch" --file "$work/helper" > /dev/null
 bin_dir="$HOME/.local/bin"
 target="$bin_dir/voidchat-helper"
 mkdir -p "$bin_dir"
@@ -80,7 +77,7 @@ register_helper_path() {
   if ! grep -F "$marker" "$profile" >/dev/null 2>&1; then
     printf '\n%s\n%s\n' "$marker" 'case ":$PATH:" in *":$HOME/.local/bin:"*) ;; *) export PATH="$HOME/.local/bin:$PATH" ;; esac' >> "$profile"
   fi
-  printf 'New login shells load %s from %s; current shell: export PATH="$HOME/.local/bin:$PATH"\n' "$target" "$profile"
+  printf 'Command added to PATH for new login shells.\n'
 }
 # END helper-path
 register_helper_path
@@ -101,8 +98,8 @@ if [ "$service" = user ]; then
     launchctl bootout "gui/$(id -u)/seths.app.voidchat.helper" >/dev/null 2>&1 || true
     launchctl bootstrap "gui/$(id -u)" "$plist"
   fi
-else "$target" start; fi
-printf 'Installed helper %s (catalog key primary: %s).\n' "$selected_version" "$public_key"
+else "$target" start > /dev/null; fi
+printf '\nVoidChat helper %s installed.\n' "$selected_version"
 # BEGIN pairing-readiness
 pairing_ready() {
   attempt=0
@@ -119,5 +116,5 @@ if [ "$enable_remote" = yes ]; then
   "$target" enable
   pairing_ready
 else
-  echo 'Remote access was not changed (off on a first install). To pair this host, rerun with --enable-remote after signing in to Tailscale.'
+  echo 'To pair this computer, run: voidchat-helper enable && voidchat-helper invite'
 fi
