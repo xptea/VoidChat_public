@@ -3,7 +3,7 @@
 # the signed catalog and downloaded helper before installation.
 param([ValidateSet('None','User')][string]$Service='None',[switch]$EnableRemote)
 $ErrorActionPreference='Stop'
-$taskVersion='0.1.1'
+$taskVersion='0.1.2'
 $taskCatalogURL='https://raw.githubusercontent.com/xptea/VoidChat_public/main/versions.json'
 $taskPublicKey='WXyktmciSitTp6LhDDCcWyOSVwCmCliFIdKD1ZTzsZk='
 # BEGIN pairing-readiness
@@ -25,12 +25,12 @@ $taskCPU=$env:PROCESSOR_ARCHITEW6432
 if (-not $taskCPU) {$taskCPU=$env:PROCESSOR_ARCHITECTURE}
 $taskArch=switch($taskCPU.ToUpperInvariant()) {'AMD64' {'amd64'} default {throw 'New Windows helper releases support amd64 only.'}}
 $taskHashes=@{
-    'darwin-arm64' = 'f7bc579160718101bcb6889eb442a99a0f3d315a358a8c6260e607095ce8f0cc'
-    'linux-386' = '9a97c82eacd2e8785a7f1436d3791bfa67b006d1859b1e3b88dd8550dcca18fc'
-    'linux-amd64' = '989724f7b2fb176a25c467e7557198e0bf52c36dd3bdc20f1d4e6b4cef5150ab'
-    'linux-arm' = '1fb0680611f2a9e1b52bbccfcbda9d00cfec0c7adca16c858e51980279f3cbf2'
-    'linux-arm64' = '39fa4c7a388973103ef6ef7f0142d0121cf3780487fc441ba16aa4809ed674f2'
-    'windows-amd64' = '70bf5cabcea1aca73677b3272f1ee8e9e8dbd8ba20ce45451f745496869ef6c9'
+    'darwin-arm64' = '842ed70f783687566f4e1cf3570237da5e2d6e856c2580ecbb9dce50a3e37fe3'
+    'linux-386' = 'fead152f270e26930babbaa4cff7305c685870e46993f4112de93ab793369d68'
+    'linux-amd64' = '90f065f770c457d1f1de89dd0e1bb45d823172250786216cb4e815c53b818687'
+    'linux-arm' = '4147061a88bd5c883d6a11372f91a44b145133eec0cbaa5189ff6a3b338d5d62'
+    'linux-arm64' = '653c71ae785b9c3b756a2f2be80e4e19f1565496b9e2d2e3b45c9e7abaf07b7a'
+    'windows-amd64' = 'fea6033e96e8eb65d714b4ce85001cfb08ed5078191c75aa5e98b317282bf35c'
 
 }
 $taskExpected=$taskHashes["windows-$taskArch"]

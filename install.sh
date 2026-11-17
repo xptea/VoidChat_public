@@ -4,7 +4,7 @@
 # SHA256 are embedded here; no unsigned catalog supplies executable trust.
 set -eu
 umask 077
-version='0.1.1'
+version='0.1.2'
 catalog_url='https://raw.githubusercontent.com/xptea/VoidChat_public/main/versions.json'
 public_key='WXyktmciSitTp6LhDDCcWyOSVwCmCliFIdKD1ZTzsZk='
 case "$version" in *@*) echo 'Use the generated installer from the public distribution repository.' >&2; exit 1;; esac
@@ -24,12 +24,12 @@ fi
 printf 'Installing VoidChat helper...\n'
 verifier_sha=''
 case "$os-$arch" in
-    darwin-arm64) verifier_sha='f7bc579160718101bcb6889eb442a99a0f3d315a358a8c6260e607095ce8f0cc' ;;
-    linux-386) verifier_sha='9a97c82eacd2e8785a7f1436d3791bfa67b006d1859b1e3b88dd8550dcca18fc' ;;
-    linux-amd64) verifier_sha='989724f7b2fb176a25c467e7557198e0bf52c36dd3bdc20f1d4e6b4cef5150ab' ;;
-    linux-arm) verifier_sha='1fb0680611f2a9e1b52bbccfcbda9d00cfec0c7adca16c858e51980279f3cbf2' ;;
-    linux-arm64) verifier_sha='39fa4c7a388973103ef6ef7f0142d0121cf3780487fc441ba16aa4809ed674f2' ;;
-    windows-amd64) verifier_sha='70bf5cabcea1aca73677b3272f1ee8e9e8dbd8ba20ce45451f745496869ef6c9' ;;
+    darwin-arm64) verifier_sha='842ed70f783687566f4e1cf3570237da5e2d6e856c2580ecbb9dce50a3e37fe3' ;;
+    linux-386) verifier_sha='fead152f270e26930babbaa4cff7305c685870e46993f4112de93ab793369d68' ;;
+    linux-amd64) verifier_sha='90f065f770c457d1f1de89dd0e1bb45d823172250786216cb4e815c53b818687' ;;
+    linux-arm) verifier_sha='4147061a88bd5c883d6a11372f91a44b145133eec0cbaa5189ff6a3b338d5d62' ;;
+    linux-arm64) verifier_sha='653c71ae785b9c3b756a2f2be80e4e19f1565496b9e2d2e3b45c9e7abaf07b7a' ;;
+    windows-amd64) verifier_sha='fea6033e96e8eb65d714b4ce85001cfb08ed5078191c75aa5e98b317282bf35c' ;;
 
   *) echo 'No signed release for this platform.' >&2; exit 1;;
 esac
